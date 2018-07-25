@@ -26,8 +26,7 @@ sub finishTask {
 }
 
 sub listTasks {
-	print "listing tasks\n";
-	open(my $in, "<", "$taskdir/$list") or die "can't open file";
+	open(my $in, "<", "$taskdir/$list") or return 0;
 	my @stack = (); #stack of (indentation, text) tuples
 	push(@stack, [-1,""]);
 	my $line = 0;
@@ -45,7 +44,7 @@ sub listTasks {
 				push(@stack, [$len, $3]);
 			}
 
-			print("$line) $1$3\n") if ($2 eq " ");
+			print("$line. $1$3\n") if ($2 eq " ");
 		}
 
 		$line = $line + 1;
@@ -81,8 +80,6 @@ if ($editMode) {
 } else {
 	listTasks();
 }
-
-
 
 __END__
 

@@ -5,7 +5,7 @@
 
 [o] write code
 [ ] test code
-[ ] installer script
+[o] installer script
 [ ] documentation
 	[ ] to install
 	[ ] asciinema intro
