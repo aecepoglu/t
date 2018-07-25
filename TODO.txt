@@ -1,0 +1,26 @@
+# [o] done
+# [!] warning / in-progress
+# [ ] todo
+# ================
+
+[o] write code
+[ ] test code
+[ ] installer script
+[ ] documentation
+	[ ] to install
+	[ ] asciinema intro
+	[ ] nifty little features
+		share as gists
+
+		[ ] in version control
+		[ ] bash prompt
+		[ ] in statusbar
+		[ ] in editor
+		[ ] detailed usage wiki
+[ ] vim syntax file
+	[ ] [ ] as todo
+	[ ] [o] as done
+	[ ] [x] as error
+	[ ] [!] as warning
+	[ ] others as comments
+[ ] test if empty lines break the stack

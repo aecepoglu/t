@@ -1,26 +1,66 @@
 # t
 
-A simple task manager for people who want to complete tasks, not organize them.  
+A task manager for people who want to complete their tasks, not organize them.
 
-    TODO show introductory asciinema
+## Simple, Effective & Extensible
 
-#### Simple, Effective & Extensible
+**t**'s simplicity is its strength.
 
-**t**'s simplicity is its strength. You can easily integrate it with other tools for fun little features:
+It is a very thin utility tool to manage a 'TODO.txt' that looks like so:
 
-1. use it in version control tools: `sha1`ed keys mean you are very unlikely to get conflicts
-2. bash prompt
-3. show tasks in your editor
-4. show tasks in statusbar
+    [ ] buy groceries
+    [ ] cook
+    	[ ] chicken stew
+    	[ ] dhal
+    		[o] curry paste
+		    (remember to make extra)
+    		[o] dhal
+    		[ ] rice
+    [ ] publish 't'
+    	develop t. It should feel and function like github.com/sjl/t
+	perl could be a fun language for it
+    	[o] the perl code
+	[ ] README.md
 
-#### Why rewrite sjl/t?
+The lines in the form of:
 
-To add some features and practice Go while staying faithful to original philosophy of keeping it simple.
+      [o] the description of the tasks
+     ^ ^ ^
+     | | |
+     | | |
+     | | +---- a space
+     | +------ a character.
+     |            conventionally, although you can :
+     |              ` ` means it is a TODO,
+     |              `o` means it is done
+     |            and you can use any other k
+     |
+     +-------- any number of spaces or tabs
+                   use indentation to visually define subtasks
 
-*Also rewrite of [sjl/t](http://github.com/sjl/t) in Go with improvements*
+Any other line is considered a comment. In fact it might be helpful for you or your teammates if you put a legend on top of your TODO.txt:
 
-#### To Contribute
+    # [ ] todo
+    # [o] done
+    # [x] canceled
+    # [!] in progress
+    # [r] needs research
+    #----------------------------
+     
+## Usage
 
-The planned featureset is in the `tasks` file; choose one or suggest a feature of your own.
+* `t` lists your tasks
+* `t -e` opens your EDITOR to edit your tasks
+* `t cancel the credit card` creates the task *cancel the credit card*.
+* `t -h` shows its usage and rest of the options
 
-The codebase is easy to develop new features on top of but `t` is meant to be simple. If you are seeking something more powerful, is [TaskWarrior](http://github.com) or [todo.txt](http://github.com) might suit you better.
+## Why rewrite sjl/t
+
+[sjl's t](http://github.com/sjl/t) is what inspired this tool.
+We are staying faithful to its philosophy of keeping it simple, removing features that can be done by other tools while adding some of our own that we thought were lacking (*eg. colors*)
+
+## To Contribute
+
+The planned features are in the `TODO.txt` file :) Choose one and send me a PR or suggest a feature of your own.
+
+The codebase is very small and relatively easy to develop new features on top of, but `t` is meant to be simple. If you are seeking something more powerful, [TaskWarrior](todo) or [todo.txt](todo) might suit you better.
