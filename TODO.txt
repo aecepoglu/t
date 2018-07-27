@@ -4,7 +4,7 @@
 # ================
 
 [o] write code
-[ ] test code
+[o] test code
 [o] installer script
 [ ] documentation
 	[ ] to install
@@ -18,9 +18,8 @@
 		[ ] in editor
 		[ ] detailed usage wiki
 [ ] vim syntax file
-	[ ] [ ] as todo
-	[ ] [o] as done
-	[ ] [x] as error
-	[ ] [!] as warning
-	[ ] others as comments
+	[ ] recognize [ ] as todo
+	[ ] recognize [o] or [x] as done
+	[ ] recognize [k] where k can be any character as other
+	[ ] treat other lines as comments
 [ ] test if empty lines break the stack

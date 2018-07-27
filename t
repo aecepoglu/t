@@ -29,7 +29,7 @@ sub listTasks {
 	open(my $in, "<", "$taskdir/$list") or return 0;
 	my @stack = (); #stack of (indentation, text) tuples
 	push(@stack, [-1,""]);
-	my $line = 0;
+	my $line = 1;
 
 	while (<$in>) {
 		if (/^(\s*)\[(.)\] (.*)/) {
