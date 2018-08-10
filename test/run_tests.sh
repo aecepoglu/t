@@ -8,16 +8,20 @@ function globalsetup {
 
 	echo "\
 [ ] the first task
-[o] the second task is complete
 [ ] a parent task
 	[ ] a child task
 		[ ] a grandchild
-		[o] this grandchild is complete
-	[o] another child
-		[ ] incomplete grandchild of complete parent
-		[o] complete grandchild of complete parent
+
+			some comments about the grandchild task
+			some more comments
+
+			even more comments
+
+			[ ] child to grandchild
+		[ ] second grandchild
+	[ ] another child
+		[ ] third grandchild
 [ ] another parent
-	[o] a complete child
 	[ ] yet another child" > sample-complex-todo.txt
 
 	echo "\
@@ -45,11 +49,35 @@ function test_list_format {
 	cp ../sample-complex-todo.txt TODO.txt
 	echo "\
 1. the first task
-3. a parent task
-4. 	a child task
-5. 		a grandchild
-10. another parent
-12. 	yet another child" > expected.txt
+2. a parent task
+3. 	a child task
+4. 		a grandchild
+11. 			child to grandchild
+12. 		second grandchild
+13. 	another child
+14. 		third grandchild
+15. another parent
+16. 	yet another child" > expected.txt
+
+	../t | diff expected.txt - || return 1
+}
+
+function test_hides_complete_items {
+	echo "\
+[o] complete item
+[ ] incomplete item
+[o] complete parent
+	[ ] incomplete child of complete parent
+	[o] complete child of complete parent
+[ ] incomplete parent
+	[ ] incomplete child of incomplete parent
+	[o] complete child of incomplete parent
+[k] a different item" > TODO.txt
+	echo "\
+2. incomplete item
+4. 	incomplete child of complete parent
+6. incomplete parent
+7. 	incomplete child of incomplete parent" > expected.txt
 
 	../t | diff expected.txt - || return 1
 }
@@ -105,6 +133,7 @@ function main {
 		test_list_in_other_file \
 		test_list_in_other_folder \
 		test_list_with_nonexistent_file \
+		test_hides_complete_items \
 		test_add_task \
 		test_add_task_with_nonexistent_list_file \
 	)

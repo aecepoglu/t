@@ -35,9 +35,14 @@ sub listTasks {
 		if (/^(\s*)\[(.)\] (.*)/) {
 			#$1: indentation, $2: mode, $3: text
 			my $len = length $1;
+			#pop all the previously items pushed to stack
+			# that were children of my previously encountered siblings
 			while ($len < $stack[-1][0]) {
 				pop(@stack);
 			}
+			#if I am the same level as the last item in stack (it is my sibling)
+			#	then overwrite it in the stack
+			#otherwise I must be its child
 			if ($len == $stack[-1][0]) {
 				@stack[-1] = [$len, $3];
 			} else {

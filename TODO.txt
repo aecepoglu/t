@@ -17,9 +17,10 @@
 		[ ] in statusbar
 		[ ] in editor
 		[ ] detailed usage wiki
-[ ] vim syntax file
-	[ ] recognize [ ] as todo
-	[ ] recognize [o] or [x] as done
-	[ ] recognize [k] where k can be any character as other
-	[ ] treat other lines as comments
-[ ] test if empty lines break the stack
+[o] vim syntax file
+	[o] recognize [ ] as todo
+	[x] recognize [o] or [x] as done
+	[o] recognize [k] where k can be any character as other
+	[o] treat other lines as comments
+[o] test if empty lines break the stack
+[ ] write tests for finding first TODO.txt while going recursively upwards until "/"
