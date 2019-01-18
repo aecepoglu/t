@@ -30,7 +30,7 @@ function globalsetup {
 }
 
 function globalcleanup {
-	rm ./t
+	rm ./t #I need to ensure I am not deleting the actual program and lose my changes
 	rm ./sample-complex-todo.txt
 	rm ./sample-basic-todo.txt
 }
@@ -83,13 +83,20 @@ function test_hides_complete_items {
 }
 
 function test_list_in_other_folder {
-	mkdir somewhere-else
-	cp ../sample-basic-todo.txt ./somewhere-else/TODO.txt
+	otherdir=$(mktemp -d T_TEST_XXX)
+	cp ../sample-basic-todo.txt ./$otherdir/TODO.txt
 	echo "\
 1. first task
 2. second task" > expected.txt
 	
-	../t -t somewhere-else | diff expected.txt - || return 1
+	../t -t $otherdir | diff expected.txt - || return 1
+}
+
+function test_list_in_other_folder_with_nonexistent_file {
+	otherdir=$(mktemp -d T_TEST_XXX)
+
+	echo -n "" > expected.txt
+	../t -t $otherdir | diff -y expected.txt - || return 1
 }
 
 function test_list_in_other_file {
@@ -100,9 +107,16 @@ function test_list_in_other_file {
 	../t -l "another.txt" | diff expected.txt - || return 1
 }
 
-function test_list_with_nonexistent_file {
-	echo -n "" > expected.txt
-	../t | diff -y expected.txt - || return 1
+function test_list_from_parent_dir {
+	folder=$(mktemp -d T_TEST_XXX)
+	cd $folder
+
+	cp ../../sample-basic-todo.txt ../TODO.txt
+	../../t -t ../ > expected.txt
+
+	../../t | diff -y expected.txt - || return 1
+
+	cd ../
 }
 
 function test_add_task {
@@ -119,7 +133,7 @@ function test_add_task {
 function test_add_task_with_nonexistent_list_file {
 	echo "[ ] a new task" > expected.txt
 
-	../t a new task || return 1
+	../t -t ./ a new task || return 1
 	diff --color=always TODO.txt expected.txt || return 1
 }
 
@@ -132,7 +146,8 @@ function main {
 		test_list_format \
 		test_list_in_other_file \
 		test_list_in_other_folder \
-		test_list_with_nonexistent_file \
+		test_list_in_other_folder_with_nonexistent_file \
+		test_list_from_parent_dir \
 		test_hides_complete_items \
 		test_add_task \
 		test_add_task_with_nonexistent_list_file \

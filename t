@@ -9,9 +9,20 @@ my $editMode;
 my $finishId = -1;
 my $list = "TODO.txt";
 my $taskdir = "./";
-my $verbose;
+my $isTaskdirExplicit = 0;
 my $showColors;
 my $showHelp;
+#my $VERSION = "0.8.0";
+
+sub findTasksDir {
+	my $dir = shift;
+
+	until (-e "$dir/$list") {
+		$dir = "$dir/../";
+	}
+
+	return $dir;
+}
 
 sub editTasks {
 	if (exists $ENV{"EDITOR"}) {
@@ -70,11 +81,18 @@ GetOptions(
 	"e|edit" => \$editMode,
 	"f|finish=i" => \$finishId,
 	"l|list=s" => \$list,
-	"t|task-dir=s" => \$taskdir,
-	"v|verbose" => \$verbose,
+	"t|task-dir=s" => sub{
+		$taskdir = $_[1];
+		$isTaskdirExplicit = 1;
+	},
 	"h|help" => \$showHelp
 ) or pod2usage(2);
+
 pod2usage(1) if $showHelp;
+
+if (!$isTaskdirExplicit) {
+	$taskdir = findTasksDir($taskdir);
+}
 
 if ($editMode) {
 	editTasks();
@@ -92,6 +110,10 @@ __END__
 
 t - a stupid simple task manager
 
+=head VERSION
+
+version 0.8.0
+
 =head SYNOPSIS
 
 t [OPTIONS] [NEW TASK]
@@ -102,22 +124,19 @@ t [OPTIONS] [NEW TASK]
 
 =item (-f | --finish) TASK_ID
 
-finishes task with id
+Finishes task with id.
 
 =item (-l | --list) name
 
-uses given filename instead of "TODO.txt"
+Uses given filename instead of "TODO.txt".
 
 =item (-t | --task-dir) name
 
-uses task file in given path rather than "./"
-
-=item (-v | --verbose)
-
-verbose mode on
+Uses task file in given directory.
+If not given, the file will be searched in current director or in the parent directories.
 
 =item (-h | --help)
 
-show help
+Show help
 
 =back

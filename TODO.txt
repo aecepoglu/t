@@ -23,4 +23,4 @@
 	[o] recognize [k] where k can be any character as other
 	[o] treat other lines as comments
 [o] test if empty lines break the stack
-[ ] write tests for finding first TODO.txt while going recursively upwards until "/"
+[o] write tests for finding first TODO.txt while going recursively upwards until "/"
