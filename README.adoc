@@ -1,0 +1,16 @@
+= t
+
+A utility for managing `TODO` s in your `life.adoc`.
+
+The file `life.adoc` can be in your current directory or in any ancestor directory.
+
+.Usage
+------
+t       # counts TODOs
+
+t l     #
+t list  # list TODOs
+
+t e     # 
+t edit  # opens the file editor
+-----

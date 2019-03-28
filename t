@@ -1,142 +1,119 @@
-#!/usr/bin/env perl
-use strict;
-use warnings;
-use Getopt::Long;
-use Pod::Usage;
-use Term::ANSIColor;
+#!/usr/bin/env lua5.3
 
-my $editMode;
-my $finishId = -1;
-my $list = "TODO.txt";
-my $taskdir = "./";
-my $isTaskdirExplicit = 0;
-my $showColors;
-my $showHelp;
-#my $VERSION = "0.8.0";
+local Lfs = require("lfs")
 
-sub findTasksDir {
-	my $dir = shift;
-
-	until (-e "$dir/$list") {
-		$dir = "$dir/../";
-	}
-
-	return $dir;
+local Mode = {
+	list = 0,
+	edit = 1,
+	count = 2,
 }
 
-sub editTasks {
-	if (exists $ENV{"EDITOR"}) {
-		system($ENV{"EDITOR"}, "$taskdir/$list");
-	} else {
-		die "EDITOR not set";
-	}
-}
+local function split(str, delim)
+	local tokens = {}
+	for w in (str .. delim):gmatch("(.-)"..delim) do
+		table.insert(tokens, w)
+	end
 
-sub finishTask {
-	print "TODO: finish task with id: $finishId\n";
-}
+	return tokens
+end
 
-sub listTasks {
-	open(my $in, "<", "$taskdir/$list") or return 0;
-	my @stack = (); #stack of (indentation, text) tuples
-	push(@stack, [-1,""]);
-	my $line = 1;
+local function join(tokens, len, delim)
+	local resp = ""
+	for i = 1, len do
+		resp = resp .. delim .. tokens[i]
+	end
+	return resp
+end
 
-	while (<$in>) {
-		if (/^(\s*)\[(.)\] (.*)/) {
-			#$1: indentation, $2: mode, $3: text
-			my $len = length $1;
-			#pop all the previously items pushed to stack
-			# that were children of my previously encountered siblings
-			while ($len < $stack[-1][0]) {
-				pop(@stack);
-			}
-			#if I am the same level as the last item in stack (it is my sibling)
-			#	then overwrite it in the stack
-			#otherwise I must be its child
-			if ($len == $stack[-1][0]) {
-				@stack[-1] = [$len, $3];
-			} else {
-				push(@stack, [$len, $3]);
-			}
+local function quit(msg)
+	print(msg)
+	os.exit(1)
+end
 
-			print("$line. $1$3\n") if ($2 eq " ");
-		}
+local function find_in_ancestry(filename)
+	local tokens = split(Lfs.currentdir(), "/")
+	local len = #tokens
+	local tested = {}
 
-		$line = $line + 1;
-	}
+	while len > 0 do
+		local path = join(tokens, len, "/") .. "/" .. filename
+		table.insert(tested, path)
+		if Lfs.attributes(path) ~= nil then
+			return true, path, tested
+		end
+		len = len - 1
+	end
 
-	close $in;
-}
+	return false, nil, tested
+end
 
-sub createTask {
-	my $text = shift;
-	open(my $out, ">>", "$taskdir/$list") or die "can't open file";
-	print $out "[ ] $text\n";
-	close $out;
-}
+local function collect_todos(path, regex, f, acc0)
+	local acc = acc0
+	for line in io.open(path):lines() do
+		local x = line:match(regex)
+		if x then
+			acc = f(acc, x)
+		end
+	end
+	return acc
+end
 
-Getopt::Long::Configure("bundling");
-GetOptions(
-	"e|edit" => \$editMode,
-	"f|finish=i" => \$finishId,
-	"l|list=s" => \$list,
-	"t|task-dir=s" => sub{
-		$taskdir = $_[1];
-		$isTaskdirExplicit = 1;
-	},
-	"h|help" => \$showHelp
-) or pod2usage(2);
+local function main(mode, filename)
+	local has_found, path, checked_paths = find_in_ancestry(filename)
 
-pod2usage(1) if $showHelp;
+	if not has_found then
+		return quit(
+			"Couldn't find \"" .. filename .. "\" in these locations:\n"
+			.. (join(checked_paths, "\n"))
+		)
+	end
 
-if (!$isTaskdirExplicit) {
-	$taskdir = findTasksDir($taskdir);
-}
+	if mode == Mode.count then
+		print(
+			collect_todos(
+				path,
+				"%sTODO ",
+				function(acc, _)
+					return acc + 1
+				end,
+				0
+			)
+		)
+	elseif mode == Mode.list then
+		print(
+			collect_todos(
+				path,
+				"%sTODO (.+)",
+				function(acc, descr)
+					return acc .. (acc == "" and "" or "\n") .. descr
+				end,
+				""
+			)
+		)
+	else --edit
+		local editor = os.getenv("EDITOR") or quit("EDITOR not set")
+		os.execute(editor .. " " .. path)
+	end
+end
 
-if ($editMode) {
-	editTasks();
-} elsif ($finishId > 0) {
-	finishTask();
-} elsif ($#ARGV > 0) {
-	createTask(join(" ", @ARGV));
-} else {
-	listTasks();
-}
+local function parse_args(arg)
+	local mode = Mode.list
 
-__END__
+	if (#arg == 1) then
+		local x = arg[1]:sub(1, 1)
 
-=head NAME
+		if x == "e" then
+			mode = Mode.edit
+		elseif x == "l" then
+			mode = Mode.list
+		elseif x == "c" then
+			mode = Mode.count
+		else
+			quit("Unknown mode: \"" .. x .. "\". Valid options are (e|edit|l|list|c|count)")
+		end
+	end
 
-t - a stupid simple task manager
+	return mode
+end
 
-=head VERSION
-
-version 0.8.0
-
-=head SYNOPSIS
-
-t [OPTIONS] [NEW TASK]
-
-=head1 OPTIONS
-
-=over 4
-
-=item (-f | --finish) TASK_ID
-
-Finishes task with id.
-
-=item (-l | --list) name
-
-Uses given filename instead of "TODO.txt".
-
-=item (-t | --task-dir) name
-
-Uses task file in given directory.
-If not given, the file will be searched in current director or in the parent directories.
-
-=item (-h | --help)
-
-Show help
-
-=back
+main(parse_args(arg), "life.adoc")
