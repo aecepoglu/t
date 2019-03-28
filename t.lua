@@ -1,6 +1,4 @@
-#!/usr/bin/env lua5.3
-
-local Lfs = require("lfs")
+local lfs = require("lfs")
 
 local Mode = {
 	list = 0,
@@ -31,14 +29,14 @@ local function quit(msg)
 end
 
 local function find_in_ancestry(filename)
-	local tokens = split(Lfs.currentdir(), "/")
+	local tokens = split(lfs.currentdir(), "/")
 	local len = #tokens
 	local tested = {}
 
 	while len > 0 do
 		local path = join(tokens, len, "/") .. "/" .. filename
 		table.insert(tested, path)
-		if Lfs.attributes(path) ~= nil then
+		if lfs.attributes(path) ~= nil then
 			return true, path, tested
 		end
 		len = len - 1
