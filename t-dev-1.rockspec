@@ -13,11 +13,8 @@ dependencies = {
 }
 build = {
    type = "builtin",
-   modules = {
-		install = {
-			bin = {
-				{t = "t.lua"}
-			}
-		}
+   modules = {},
+	install = {
+		bin = { "t" }
 	}
 }

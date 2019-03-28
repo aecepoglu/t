@@ -1,3 +1,5 @@
+#!/usr/bin/env lua5.3
+
 local lfs = require("lfs")
 
 local Mode = {
@@ -62,7 +64,7 @@ local function main(mode, filename)
 	if not has_found then
 		return quit(
 			"Couldn't find \"" .. filename .. "\" in these locations:\n"
-			.. (join(checked_paths, "\n"))
+			.. (join(checked_paths, #checked_paths, "\n"))
 		)
 	end
 
